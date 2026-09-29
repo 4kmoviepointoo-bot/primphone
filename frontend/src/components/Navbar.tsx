@@ -309,6 +309,7 @@ export default function Navbar() {
           {/* Cart */}
           <motion.button
             onClick={openCart}
+            aria-label="Shopping Cart"
             className="relative w-10 h-10 rounded-full glass flex items-center justify-center text-slate-500 hover:text-primary transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -334,6 +335,7 @@ export default function Navbar() {
             <div className="relative">
               <motion.button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
+                aria-label="User account menu"
                 className="flex items-center gap-2 px-2 sm:px-3 py-2 rounded-full glass hover:border-primary/30 border border-transparent transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -397,6 +399,7 @@ export default function Navbar() {
           {/* Mobile menu toggle */}
           <motion.button
             onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation menu"
             className="md:hidden w-10 h-10 rounded-full glass flex items-center justify-center text-slate-500 hover:text-primary transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

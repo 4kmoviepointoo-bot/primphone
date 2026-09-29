@@ -123,6 +123,8 @@ export default function ProductCard({ product, index = 0 }: Props) {
                <img 
                  src={product.image_url} 
                  alt={product.name} 
+                 loading="lazy"
+                 decoding="async"
                  className="w-full h-full object-contain mix-blend-multiply"
                />
                <div className="absolute inset-0 bg-gradient-to-tr from-black/5 to-transparent pointer-events-none" />
@@ -182,6 +184,7 @@ export default function ProductCard({ product, index = 0 }: Props) {
 
             <motion.button
               onClick={handleAddToCart}
+              aria-label={`Add ${product.name} to cart`}
               className="relative w-11 h-11 rounded-full flex items-center justify-center overflow-hidden"
               style={{
                 background: addedFlash

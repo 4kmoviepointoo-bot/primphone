@@ -24,9 +24,9 @@ const links = {
 }
 
 const socials = [
-  { icon: <Instagram className="w-4 h-4" />, href: '#' },
-  { icon: <Twitter className="w-4 h-4" />, href: '#' },
-  { icon: <Youtube className="w-4 h-4" />, href: '#' },
+  { name: 'Instagram', icon: <Instagram className="w-4 h-4" />, href: '#' },
+  { name: 'Twitter', icon: <Twitter className="w-4 h-4" />, href: '#' },
+  { name: 'YouTube', icon: <Youtube className="w-4 h-4" />, href: '#' },
 ]
 
 export default function Footer() {
@@ -68,10 +68,12 @@ export default function Footer() {
 
               {/* Socials */}
               <div className="flex gap-3 mt-8">
-                {socials.map(({ icon, href }, i) => (
+                {socials.map(({ name, icon, href }, i) => (
                   <a
                     key={i}
                     href={href}
+                    aria-label={`Follow PrimePhone on ${name}`}
+                    rel="noopener noreferrer"
                     className="w-9 h-9 rounded-full glass border border-slate-200 flex items-center justify-center text-slate-500 hover:text-primary hover:border-primary/30 transition-all duration-300"
                   >
                     {icon}
@@ -121,10 +123,16 @@ export default function Footer() {
               >
                 <input
                   type="email"
+                  id="newsletter-email"
+                  aria-label="Email address for newsletter"
                   placeholder="your@email.com"
                   className="input-primary rounded-sm px-4 py-3 text-sm flex-1 md:w-64"
                 />
-                <button className="btn-primary px-6 py-3 rounded-sm text-sm whitespace-nowrap">
+                <button 
+                  type="submit"
+                  aria-label="Subscribe to newsletter"
+                  className="btn-primary px-6 py-3 rounded-sm text-sm whitespace-nowrap"
+                >
                   Subscribe
                 </button>
               </form>

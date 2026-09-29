@@ -36,17 +36,19 @@ export default function ParticleBackground() {
       canvas.height = window.innerHeight
     }
     resize()
-    window.addEventListener('resize', resize)
+    window.addEventListener('resize', resize, { passive: true })
+
+    const maxParticles = window.innerWidth < 768 ? 12 : 24
 
     const spawn = () => {
-      if (particles.length > 60) return
-      const maxLife = 120 + Math.random() * 180
+      if (particles.length > maxParticles) return
+      const maxLife = 140 + Math.random() * 160
       particles.push({
         x: Math.random() * canvas.width,
         y: canvas.height + 10,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: -(Math.random() * 0.6 + 0.2),
-        size: Math.random() * 2.5 + 0.5,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -(Math.random() * 0.5 + 0.15),
+        size: Math.random() * 2 + 0.5,
         opacity: 0,
         color: colors[Math.floor(Math.random() * colors.length)],
         life: 0,
@@ -55,10 +57,13 @@ export default function ParticleBackground() {
     }
 
     let frame = 0
+    let running = true
+
     const tick = () => {
+      if (!running) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       frame++
-      if (frame % 8 === 0) spawn()
+      if (frame % 12 === 0) spawn()
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
@@ -75,7 +80,7 @@ export default function ParticleBackground() {
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = `${p.color}${(p.opacity * 0.5).toFixed(2)})`
+        ctx.fillStyle = `${p.color}${(p.opacity * 0.4).toFixed(2)})`
         ctx.fill()
 
         if (p.life >= p.maxLife || p.y < -10) {
@@ -85,11 +90,25 @@ export default function ParticleBackground() {
 
       animId = requestAnimationFrame(tick)
     }
-    tick()
+
+    animId = requestAnimationFrame(tick)
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        running = false
+        cancelAnimationFrame(animId)
+      } else {
+        running = true
+        animId = requestAnimationFrame(tick)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility, { passive: true })
 
     return () => {
+      running = false
       cancelAnimationFrame(animId)
       window.removeEventListener('resize', resize)
+      document.removeEventListener('visibilitychange', handleVisibility)
     }
   }, [])
 
@@ -98,9 +117,7 @@ export default function ParticleBackground() {
       ref={canvasRef}
       id="particle-canvas"
       aria-hidden="true"
-      className="pointer-events-none"
+      className="pointer-events-none fixed inset-0 z-0 opacity-60"
     />
   )
 }
-
-

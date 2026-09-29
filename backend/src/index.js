@@ -46,7 +46,9 @@ app.use(cookieParser());
 app.use(pinoHttp({ autoLogging: { ignore: (req) => req.url === '/api/health' } }));
 
 // CORS
-const corsOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:5173'];
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',')
+  : ['http://localhost:5173', 'https://*.vercel.app'];
 app.use(cors({
   origin: corsOrigins,
   credentials: true,
@@ -94,31 +96,35 @@ if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET.length < 3
   throw new Error('JWT_REFRESH_SECRET must be at least 32 characters');
 }
 
-// Initialize database and start server
+// Initialize database
 initialize();
-const server = app.listen(PORT, () => {
-  console.log(`PrimePhone API running on port ${PORT}`);
-});
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    const { db } = require('./db');
-    db.close();
-    console.log('Database connection closed');
-    process.exit(0);
+// Start server only if not on Vercel
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, () => {
+    console.log(`PrimePhone API running on port ${PORT}`);
   });
-});
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    const { db } = require('./db');
-    db.close();
-    console.log('Database connection closed');
-    process.exit(0);
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      const { db } = require('./db');
+      db.close();
+      console.log('Database connection closed');
+      process.exit(0);
+    });
   });
-});
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      const { db } = require('./db');
+      db.close();
+      console.log('Database connection closed');
+      process.exit(0);
+    });
+  });
+}
 
 module.exports = app;

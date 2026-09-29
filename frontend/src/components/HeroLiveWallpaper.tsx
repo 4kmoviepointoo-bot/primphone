@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
-import FloatingLines from './FloatingLines'
+import { useEffect, useRef, lazy, Suspense } from 'react'
+
+const FloatingLines = lazy(() => import('./FloatingLines'))
 
 export default function HeroLiveWallpaper() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -218,19 +219,21 @@ export default function HeroLiveWallpaper() {
 
       {/* 3. React Bits Three.js FloatingLines Live Animated Canvas */}
       <div className="absolute inset-0 pointer-events-auto">
-        <FloatingLines
-          enabledWaves={['top', 'middle', 'bottom']}
-          lineCount={[10, 15, 20]}
-          lineDistance={[8, 6, 4]}
-          bendRadius={5.0}
-          bendStrength={-0.5}
-          interactive={true}
-          parallax={true}
-          parallaxStrength={0.12}
-          linesGradient={['#2563EB', '#3B82F6', '#60A5FA', '#818CF8', '#38BDF8']}
-          lightMode={true}
-          animationSpeed={0.9}
-        />
+        <Suspense fallback={null}>
+          <FloatingLines
+            enabledWaves={['top', 'middle', 'bottom']}
+            lineCount={[10, 15, 20]}
+            lineDistance={[8, 6, 4]}
+            bendRadius={5.0}
+            bendStrength={-0.5}
+            interactive={true}
+            parallax={true}
+            parallaxStrength={0.12}
+            linesGradient={['#2563EB', '#3B82F6', '#60A5FA', '#818CF8', '#38BDF8']}
+            lightMode={true}
+            animationSpeed={0.9}
+          />
+        </Suspense>
       </div>
 
       {/* 4. Subtle Luxury Geometric Grid Line Watermark */}

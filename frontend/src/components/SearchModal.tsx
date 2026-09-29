@@ -163,6 +163,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                aria-label="Search devices, series, or specifications"
                 placeholder="Search Pixel phones, Tensor G4, foldables..."
                 className="flex-1 bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-base sm:text-lg font-body"
               />
@@ -188,6 +189,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 <button
                   onClick={onClose}
+                  aria-label="Close search dialog"
                   className="hidden sm:inline-flex items-center px-2 py-1 rounded-md text-[11px] font-mono text-slate-400 bg-slate-100 border border-slate-200/80 hover:text-slate-700 transition-colors"
                 >
                   ESC

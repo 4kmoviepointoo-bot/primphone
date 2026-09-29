@@ -9,6 +9,21 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom', 'zustand'],
+          'vendor-motion': ['framer-motion', 'lucide-react'],
+          'vendor-three': ['three'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 800,
+  },
   server: {
     port: 5173,
     proxy: {

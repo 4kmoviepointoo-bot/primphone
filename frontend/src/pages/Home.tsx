@@ -428,6 +428,10 @@ function HeroPhone() {
       <img
         src="https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-xl-1.jpg"
         alt="Pixel 9 Pro XL"
+        width="288"
+        height="420"
+        loading="eager"
+        decoding="async"
         className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-phone.png' }}
       />
@@ -453,7 +457,11 @@ function SpotlightPhone() {
     >
       <img 
         src="https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-xl-1.jpg" 
-        alt="Pixel 9 Pro XL" 
+        alt="Pixel 9 Pro XL"
+        width="320"
+        height="480"
+        loading="lazy"
+        decoding="async" 
         className="w-full h-full object-contain mix-blend-multiply drop-shadow-[0_20px_30px_rgba(0,0,0,0.25)] transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent pointer-events-none" />
