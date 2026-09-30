@@ -75,43 +75,43 @@ export default function ProductCard({ product, index = 0 }: Props) {
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-b from-white to-slate-50 border border-slate-200 shadow-card hover:shadow-card-hover transition-shadow duration-500">
 
         {/* Badge */}
-        {product.badge && (
+        {Boolean(product.badge && product.badge.trim()) && (
           <div className="absolute top-4 left-4 z-10">
             <span
-              className="badge text-primary bg-white border border-primary/30"
-              style={{ fontSize: '0.6rem', letterSpacing: '0.15em' }}
+              className="badge text-primary bg-white/90 backdrop-blur-xs border border-primary/30 px-2.5 py-1 rounded-full shadow-xs"
+              style={{ fontSize: '0.65rem', letterSpacing: '0.12em' }}
             >
-              {product.badge}
+              {product.badge.trim()}
             </span>
           </div>
         )}
 
         {/* Discount tag */}
-        {discount && (
+        {Boolean(discount) && (
           <div className="absolute top-4 right-4 z-10">
-            <span className="badge bg-red-500/10 text-red-400 border border-red-500/20">
+            <span className="badge bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-full shadow-xs">
               -{discount}%
             </span>
           </div>
         )}
 
         {/* Phone image area */}
-        <div className="relative h-64 flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        <div className="relative h-64 flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 to-white/60">
           {/* Glow blob */}
           <motion.div
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
             animate={{ opacity: isHovered ? 1 : 0.4 }}
             transition={{ duration: 0.3 }}
           >
             <div
               className="w-32 h-32 rounded-full blur-3xl"
-              style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.2), transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.18), transparent 70%)' }}
             />
           </motion.div>
 
           {/* 3D Phone Image */}
           <motion.div
-            className="relative z-10 w-full h-full p-6 flex items-center justify-center"
+            className="relative z-10 w-full h-full p-4 flex items-center justify-center"
             animate={{
               y: isHovered ? -8 : 0,
               scale: isHovered ? 1.05 : 1,
@@ -119,16 +119,13 @@ export default function ProductCard({ product, index = 0 }: Props) {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformStyle: 'preserve-3d' }}
           >
-            <div className="relative w-full h-full flex items-center justify-center bg-white rounded-xl p-2 overflow-hidden shadow-[0_10px_40px_rgba(37,99,235,0.15)] ring-1 ring-slate-200">
-               <img 
-                 src={product.image_url} 
-                 alt={product.name} 
-                 loading="lazy"
-                 decoding="async"
-                 className="w-full h-full object-contain mix-blend-multiply"
-               />
-               <div className="absolute inset-0 bg-gradient-to-tr from-black/5 to-transparent pointer-events-none" />
-            </div>
+            <img 
+              src={product.image_url} 
+              alt={product.name} 
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300"
+            />
           </motion.div>
         </div>
 
@@ -145,41 +142,41 @@ export default function ProductCard({ product, index = 0 }: Props) {
           </h3>
 
           {/* Specs row */}
-          <div className="flex gap-2 mt-2 flex-wrap">
+          <div className="flex gap-2 mt-2.5 flex-wrap">
             {product.storage && (
-              <span className="text-xs text-slate-500 bg-white-3 px-2 py-0.5 rounded-sm font-mono">
+              <span className="text-xs text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md font-mono font-medium">
                 {product.storage}
               </span>
             )}
             {product.ram && (
-              <span className="text-xs text-slate-500 bg-white-3 px-2 py-0.5 rounded-sm font-mono">
+              <span className="text-xs text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md font-mono font-medium">
                 {product.ram} RAM
               </span>
             )}
           </div>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2 mt-3">
+          {/* Rating - Increased spacing to distinguish from specs */}
+          <div className="flex items-center gap-2 mt-4 pt-0.5">
             <div className="flex gap-0.5">{renderStars(product.rating)}</div>
             <span className="text-xs text-slate-400 font-mono">
               {product.rating} ({product.review_count.toLocaleString()})
             </span>
           </div>
 
-          {/* Price + CTA */}
-          <div className="flex items-end justify-between mt-4">
+          {/* Price + CTA - Anchored together across horizontal space */}
+          <div className="flex items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-100">
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-2xl font-bold gradient-primary">
                   ${product.price.toLocaleString()}
                 </span>
                 {product.original_price && (
-                  <span className="font-mono text-sm text-slate-400 line-through">
+                  <span className="font-mono text-xs text-slate-400 line-through">
                     ${product.original_price.toLocaleString()}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">Free shipping</p>
+              <p className="text-xs text-slate-400 mt-0.5">Free express shipping</p>
             </div>
 
             <motion.button

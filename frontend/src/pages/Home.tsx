@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowRight, Star, Shield, Truck, Headphones, ChevronDown } from 'lucide-react'
+import { ArrowRight, Star, Shield, Truck, Headphones, ChevronDown, Sparkles } from 'lucide-react'
 import { fetchProducts } from '@/api/client'
 import ProductCard from '@/components/ProductCard'
 import ScrollReveal from '@/components/ScrollReveal'
@@ -34,9 +34,84 @@ const features = [
   },
 ]
 
+const initialFeaturedProducts: Product[] = [
+  {
+    id: '544782ce-8bd2-4c85-8e3a-4817b9d58169',
+    name: 'Pixel 9 Pro',
+    brand: 'Google',
+    model: 'Pixel 9 Pro',
+    price: 1199,
+    storage: '256GB',
+    ram: '12GB',
+    color: 'Obsidian',
+    description: 'The most pro Pixel ever. With the best camera system in a Pixel phone, all-new Pixel Camera features, Gemini AI on device, and long-lasting battery.',
+    specs: { display: '6.3 inch LTPO OLED', processor: 'Google Tensor G4', battery: '4700 mAh', camera: '50MP + 48MP + 48MP' },
+    stock: 10,
+    image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-1.jpg',
+    badge: 'New',
+    rating: 4.9,
+    review_count: 2847,
+    featured: 1,
+  },
+  {
+    id: '645a4d3f-4234-4b26-8616-c667bdd2a16a',
+    name: 'Pixel 9 Pro XL',
+    brand: 'Google',
+    model: 'Pixel 9 Pro XL',
+    price: 1299,
+    storage: '256GB',
+    ram: '16GB',
+    color: 'Porcelain',
+    description: 'The biggest, most powerful Pixel. Expansive display, massive battery, and the complete pro camera suite.',
+    specs: { display: '6.8 inch LTPO OLED', processor: 'Google Tensor G4', battery: '5060 mAh', camera: '50MP + 48MP + 48MP' },
+    stock: 10,
+    image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-xl-1.jpg',
+    badge: 'New',
+    rating: 4.9,
+    review_count: 1923,
+    featured: 1,
+  },
+  {
+    id: 'c646906c-5bf2-4a57-9d24-4a3c4e93b1d7',
+    name: 'Pixel 9',
+    brand: 'Google',
+    model: 'Pixel 9',
+    price: 999,
+    storage: '128GB',
+    ram: '12GB',
+    color: 'Wintergreen',
+    description: 'Meet Pixel 9. A fresh new look with Gemini AI built in, powerful camera, and all-day battery life.',
+    specs: { display: '6.3 inch OLED', processor: 'Google Tensor G4', battery: '4700 mAh', camera: '50MP + 10.5MP' },
+    stock: 10,
+    image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-1.jpg',
+    badge: 'New',
+    rating: 4.8,
+    review_count: 3241,
+    featured: 1,
+  },
+  {
+    id: 'b3239202-7731-4d60-b584-17946fc731be',
+    name: 'Pixel Fold 2',
+    brand: 'Google',
+    model: 'Pixel Fold 2',
+    price: 1799,
+    storage: '256GB',
+    ram: '16GB',
+    color: 'Obsidian',
+    description: 'Unfold your world. The ultimate foldable phone with a seamless hinge, outer and inner displays, and pro-grade cameras.',
+    specs: { display: '8.0 inch inner + 6.3 inch outer OLED', processor: 'Google Tensor G3', battery: '4650 mAh', camera: '48MP + 10.8MP + 10.8MP' },
+    stock: 10,
+    image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-fold-1.jpg',
+    badge: 'Foldable',
+    rating: 4.8,
+    review_count: 987,
+    featured: 1,
+  },
+]
+
 export default function Home() {
-  const [featured, setFeatured] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [featured, setFeatured] = useState<Product[]>(initialFeaturedProducts)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
@@ -49,8 +124,15 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts({ featured: true })
-      .then((data) => setFeatured(data.slice(0, 4)))
-      .catch((err) => setError(err.message || 'Failed to load products'))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setFeatured(data.slice(0, 4))
+        }
+      })
+      .catch((err) => {
+        console.warn('Backend products fetch fallback:', err)
+        setError(err.message || 'Failed to load products')
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -77,15 +159,15 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
               >
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="font-mono text-slate-900 text-xs uppercase tracking-[0.2em] font-bold">
+                <span className="font-mono text-slate-900 text-xs font-semibold tracking-wider">
                   Google Tensor G4 • Official Store
                 </span>
               </motion.div>
 
-              {/* Main headline with enhanced contrast and subtle halo */}
+              {/* Main headline with unified font family and subtle halo */}
               <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] tracking-tight mb-6 drop-shadow-[0_2px_12px_rgba(255,255,255,0.85)]">
                 <span className="block text-slate-950 font-medium">Beyond</span>
-                <span className="block text-[#1E3A8A] italic font-serif font-semibold">Ordinary.</span>
+                <span className="block text-[#1E3A8A] italic font-display font-semibold">Ordinary.</span>
               </h1>
 
               {/* Subheadline with high-contrast text and subtle frosted plate */}
@@ -101,7 +183,7 @@ export default function Home() {
                 </p>
               </motion.div>
 
-              {/* CTAs */}
+              {/* CTAs - Harmonized in height, padding, and iconography */}
               <motion.div
                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pointer-events-auto"
                 initial={{ opacity: 0, y: 20 }}
@@ -110,20 +192,21 @@ export default function Home() {
               >
                 <motion.button
                   onClick={() => navigate('/shop')}
-                  className="btn-primary w-full sm:w-auto px-9 py-4 rounded-full text-sm font-bold flex items-center justify-center gap-2 shadow-xl shadow-primary/30"
+                  className="btn-primary w-full sm:w-auto px-9 py-4 rounded-full text-sm font-bold flex items-center justify-center gap-2.5 shadow-xl shadow-primary/30"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  Explore Collection
+                  <span>Explore Collection</span>
                   <ArrowRight className="w-4 h-4" />
                 </motion.button>
                 <motion.button
                   onClick={() => navigate('/shop?featured=true')}
-                  className="w-full sm:w-auto px-9 py-4 rounded-full text-sm font-bold flex items-center justify-center bg-white text-slate-900 hover:text-primary border border-slate-300 shadow-md hover:shadow-lg transition-all"
+                  className="group w-full sm:w-auto px-9 py-4 rounded-full text-sm font-bold flex items-center justify-center gap-2.5 bg-white text-slate-900 hover:text-primary border border-slate-300 shadow-md hover:shadow-lg transition-all"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  View Featured
+                  <span>View Featured</span>
+                  <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-primary transition-transform group-hover:translate-x-0.5" />
                 </motion.button>
               </motion.div>
 
@@ -141,14 +224,14 @@ export default function Home() {
                 ].map(({ value, label }) => (
                   <div key={label} className="text-center lg:text-left">
                     <p className="font-mono text-2xl sm:text-3xl font-extrabold text-slate-950">{value}</p>
-                    <p className="text-slate-800 text-[11px] font-mono uppercase tracking-wider font-bold mt-0.5">{label}</p>
+                    <p className="text-slate-700 text-xs font-mono uppercase tracking-wider font-semibold mt-0.5">{label}</p>
                   </div>
                 ))}
               </motion.div>
             </div>
 
-            {/* Right Column: 3D Hero Phone Showcase */}
-            <div className="lg:col-span-5 flex items-center justify-center pointer-events-auto mt-6 lg:mt-0">
+            {/* Right Column: 3D Hero Phone Showcase anchored to content rhythm */}
+            <div className="lg:col-span-5 flex items-center justify-center lg:justify-end pointer-events-auto mt-6 lg:mt-0">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -212,7 +295,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featured.map((p, i) => (
+            {(featured.length > 0 ? featured : initialFeaturedProducts).map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
             ))}
           </div>
@@ -222,7 +305,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link to="/shop">
               <motion.button
-                className="btn-outline-primary px-8 py-3 rounded-sm text-sm inline-flex items-center gap-2"
+                className="btn-primary px-9 py-3.5 rounded-full text-sm font-bold inline-flex items-center gap-2.5 shadow-lg shadow-primary/25"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
@@ -271,7 +354,7 @@ export default function Home() {
                   NEW ARRIVAL
                 </span>
                 <h2 className="font-display text-5xl md:text-6xl font-light text-slate-800 leading-tight">
-                  Pixel 9 Pro
+                  Pixel 9 Pro XL
                   <br />
                   <span className="italic gradient-primary">Redefines</span>
                   <br />
@@ -282,26 +365,27 @@ export default function Home() {
                   triple camera system. Every photo, every interaction — reimagined.
                 </p>
 
-                <div className="grid grid-cols-3 gap-4 mt-10">
+                {/* Pure typographic spec highlights without button-like containers */}
+                <div className="grid grid-cols-3 gap-6 mt-10">
                   {[
                     { v: '50MP', l: 'Main Camera' },
                     { v: 'G4', l: 'Tensor Chip' },
                     { v: '24hr', l: 'Battery Life' },
                   ].map(({ v, l }) => (
-                    <div key={l} className="glass-primary rounded-lg p-4 text-center">
-                      <p className="font-mono text-xl font-bold gradient-primary">{v}</p>
-                      <p className="text-slate-400 text-xs mt-1">{l}</p>
+                    <div key={l} className="border-l-2 border-primary/40 pl-3.5 py-1">
+                      <p className="font-mono text-2xl font-bold text-slate-900">{v}</p>
+                      <p className="text-slate-500 text-xs mt-0.5 font-medium">{l}</p>
                     </div>
                   ))}
                 </div>
 
                 <motion.button
-                  onClick={() => navigate('/shop')}
-                  className="btn-primary mt-10 px-8 py-4 rounded-sm text-sm flex items-center gap-2 w-fit"
+                  onClick={() => navigate('/shop?series=Pixel 9')}
+                  className="btn-primary mt-10 px-8 py-4 rounded-full text-sm font-bold flex items-center gap-2.5 w-fit shadow-xl shadow-primary/25"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  Shop Now — From $1,199
+                  <span>Shop Pixel 9 Pro XL — $1,299</span>
                   <ArrowRight className="w-4 h-4" />
                 </motion.button>
               </div>
@@ -435,12 +519,12 @@ function HeroPhone() {
         className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-phone.png' }}
       />
-      <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between p-3 rounded-2xl bg-slate-50/95 backdrop-blur-md border border-slate-200/80 shadow-xs">
+      <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/95 backdrop-blur-md border border-slate-200/80 shadow-xs">
         <div>
-          <p className="text-[10px] text-slate-400 font-mono">Tensor G4 • Gemini AI</p>
+          <p className="text-xs text-slate-500 font-mono font-medium">Tensor G4 • Gemini AI</p>
           <p className="text-sm font-bold text-slate-900 font-mono">$1,299</p>
         </div>
-        <span className="px-3.5 py-1.5 rounded-full bg-primary text-white text-xs font-semibold group-hover:bg-primary-dark transition-colors shadow-xs">
+        <span className="px-5 py-2 rounded-full bg-primary text-white text-xs font-bold group-hover:bg-primary-dark transition-colors shadow-xs">
           Explore
         </span>
       </div>

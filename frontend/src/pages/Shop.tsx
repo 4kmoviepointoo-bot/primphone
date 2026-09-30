@@ -96,7 +96,11 @@ export default function Shop() {
     if (range.max < 9999) params.maxPrice = range.max
 
     fetchProducts(params)
-      .then(setProducts)
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data)
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [search, sort, priceRange, activeCategory])

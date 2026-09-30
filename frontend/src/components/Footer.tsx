@@ -37,9 +37,9 @@ export default function Footer() {
       <div className="absolute bottom-0 right-1/4 w-64 h-64 orb orb-purple opacity-20" />
 
       <div className="relative max-w-7xl mx-auto px-6 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Brand column */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-5">
             <ScrollReveal direction="left">
               <Link to="/" className="inline-block mb-6">
                 <span className="font-display text-3xl font-light tracking-widest">
@@ -59,14 +59,14 @@ export default function Footer() {
                   { icon: <Phone className="w-4 h-4 text-primary flex-shrink-0" />, text: '+971 4 123 4567' },
                   { icon: <Mail className="w-4 h-4 text-primary flex-shrink-0" />, text: 'hello@primphone.com' },
                 ].map(({ icon, text }) => (
-                  <div key={text} className="flex items-center gap-3 text-slate-400 text-sm">
+                  <div key={text} className="flex items-center gap-3 text-slate-500 text-sm font-medium">
                     {icon}
                     <span>{text}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Socials */}
+              {/* Socials - Matching solid primary accent of contact info */}
               <div className="flex gap-3 mt-8">
                 {socials.map(({ name, icon, href }, i) => (
                   <a
@@ -74,7 +74,7 @@ export default function Footer() {
                     href={href}
                     aria-label={`Follow PrimePhone on ${name}`}
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full glass border border-slate-200 flex items-center justify-center text-slate-500 hover:text-primary hover:border-primary/30 transition-all duration-300"
+                    className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-xs"
                   >
                     {icon}
                   </a>
@@ -83,42 +83,44 @@ export default function Footer() {
             </ScrollReveal>
           </div>
 
-          {/* Link columns */}
-          {Object.entries(links).map(([category, items], ci) => (
-            <ScrollReveal key={category} direction="up" delay={ci * 0.1}>
-              <h4 className="font-mono text-xs uppercase tracking-widest text-primary mb-5">
-                {category}
-              </h4>
-              <ul className="space-y-3">
-                {items.map(({ label, href }) => (
-                  <li key={label}>
-                    <Link
-                      to={href}
-                      className="text-slate-400 text-sm hover:text-slate-800 transition-colors duration-200 animated-underline"
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </ScrollReveal>
-          ))}
+          {/* Link columns - Even distribution with consistent gutters */}
+          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+            {Object.entries(links).map(([category, items], ci) => (
+              <ScrollReveal key={category} direction="up" delay={ci * 0.1}>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-primary mb-5 font-bold">
+                  {category}
+                </h3>
+                <ul className="space-y-3">
+                  {items.map(({ label, href }) => (
+                    <li key={label}>
+                      <Link
+                        to={href}
+                        className="text-slate-500 text-sm hover:text-slate-900 transition-colors duration-200 animated-underline font-medium"
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
 
-        {/* Newsletter */}
+        {/* Newsletter - Aligned to exact left margin of logo and contact info */}
         <ScrollReveal direction="up" delay={0.3}>
           <div className="mt-16 pt-12 border-t border-slate-200">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 max-w-4xl">
               <div>
-                <h4 className="font-heading text-xl text-slate-800">
+                <h3 className="font-heading text-xl text-slate-900 font-bold">
                   Stay in the loop
-                </h4>
-                <p className="text-slate-400 text-sm mt-1">
-                  Get exclusive offers and new product alerts.
+                </h3>
+                <p className="text-slate-500 text-sm mt-1">
+                  Get exclusive offers, feature releases, and new product alerts.
                 </p>
               </div>
               <form
-                className="flex gap-3 w-full md:w-auto"
+                className="flex items-center gap-3 w-full sm:w-auto"
                 onSubmit={(e) => e.preventDefault()}
               >
                 <input
@@ -126,12 +128,12 @@ export default function Footer() {
                   id="newsletter-email"
                   aria-label="Email address for newsletter"
                   placeholder="your@email.com"
-                  className="input-primary rounded-sm px-4 py-3 text-sm flex-1 md:w-64"
+                  className="input-primary rounded-full px-5 py-3 text-sm flex-1 sm:w-72 shadow-xs bg-slate-50 border border-slate-200/80"
                 />
                 <button 
                   type="submit"
                   aria-label="Subscribe to newsletter"
-                  className="btn-primary px-6 py-3 rounded-sm text-sm whitespace-nowrap"
+                  className="btn-primary px-7 py-3 rounded-full text-sm font-bold whitespace-nowrap shadow-md shadow-primary/20"
                 >
                   Subscribe
                 </button>
