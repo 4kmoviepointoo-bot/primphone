@@ -409,21 +409,20 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — fixed full-height overlay so ALL sections are always visible */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-slate-100 shadow-lg pointer-events-auto"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            className="md:hidden fixed top-16 left-0 right-0 bottom-0 bg-white border-t border-slate-100 shadow-lg pointer-events-auto overflow-y-auto z-50"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
           >
-            <nav className="flex flex-col py-4 px-6 gap-1">
+            <nav className="flex flex-col py-4 px-6 gap-1 pb-10">
 
               {/* ── CTA Section at top ── */}
               {user ? (
-                /* Logged in: greet user */
                 <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-2xl bg-primary/5 border border-primary/10">
                   <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
                     <User className="w-4 h-4 text-primary" />
@@ -434,7 +433,6 @@ export default function Navbar() {
                   </div>
                 </div>
               ) : (
-                /* Guest: Show Sign In + Sign Up CTAs */
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -461,12 +459,13 @@ export default function Navbar() {
                 </motion.div>
               )}
 
+              {/* Main Nav Links */}
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  transition={{ delay: i * 0.04 }}
                 >
                   <Link
                     to={link.href}
@@ -478,7 +477,7 @@ export default function Navbar() {
                 </motion.div>
               ))}
 
-              {/* Mobile Series Section */}
+              {/* Pixel Series */}
               <div className="pt-3 border-t border-slate-100 space-y-0.5 mt-2">
                 <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 block mb-1">
                   Pixel Series
@@ -496,7 +495,7 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {/* Mobile Policies & Legal Section */}
+              {/* Policies & Legal */}
               <div className="pt-3 border-t border-slate-100 space-y-0.5 mt-2">
                 <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 block mb-1">
                   Policies &amp; Legal
@@ -514,20 +513,12 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {/* Logged-in user: Sign Out at bottom */}
+              {/* Logged-in: Sign Out */}
               {user && (
-                <div className="pt-3 border-t border-slate-100 mt-2 flex flex-col gap-2">
-                  <Link
-                    to="/shop"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold font-mono bg-slate-900 text-white hover:bg-slate-700 transition-all min-h-[48px] shadow-md"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    Shop All Phones
-                  </Link>
+                <div className="pt-3 border-t border-slate-100 mt-2">
                   <button
                     onClick={() => { logout(); setMenuOpen(false) }}
-                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-mono text-red-500 hover:bg-red-50 transition-all min-h-[44px] border border-red-100"
+                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-mono text-red-500 hover:bg-red-50 transition-all min-h-[44px] border border-red-100 w-full"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
