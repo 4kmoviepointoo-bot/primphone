@@ -114,12 +114,16 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const heroRef = useRef<HTMLDivElement>(null)
+
+  // On mobile, skip the parallax scroll transform — it costs significant TBT
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   })
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 60])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.88, 1], [1, 1, 0])
+  const heroY = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, 60])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.88, 1], isMobile ? [1, 1, 1] : [1, 1, 0])
   const navigate = useNavigate()
 
   useEffect(() => {

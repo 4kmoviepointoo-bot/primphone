@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+/* Google Fonts loaded non-blocking via index.html preload — no @import here */
 
 @tailwind base;
 @tailwind components;
@@ -296,4 +296,11 @@ body {
   .cursor-luxury {
     cursor: none;
   }
+}
+
+/* ─── Mobile CSS particle pulse (zero CPU, hardware GPU only) ── */
+@keyframes mobilePulse {
+  0%   { opacity: 0.1; transform: translateY(0) scale(1); }
+  50%  { opacity: 0.5; transform: translateY(-8px) scale(1.4); }
+  100% { opacity: 0.1; transform: translateY(0) scale(1); }
 }

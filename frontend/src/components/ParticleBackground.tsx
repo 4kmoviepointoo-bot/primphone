@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, memo } from 'react'
 
 interface Particle {
   x: number
@@ -12,13 +12,22 @@ interface Particle {
   maxLife: number
 }
 
-export default function ParticleBackground() {
+// Pure CSS particles for mobile — zero canvas, zero rAF, zero CPU
+const CSS_PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  left: `${6 + (i * 6.5) % 88}%`,
+  top: `${5 + (i * 7.3) % 85}%`,
+  size: 2 + (i % 3),
+  delay: `${(i * 0.55).toFixed(2)}s`,
+  duration: `${4 + (i % 4)}s`,
+  color: i % 3 === 0 ? '37,99,235' : i % 3 === 1 ? '96,165,250' : '148,163,184',
+  opacity: 0.18 + (i % 4) * 0.06,
+}))
+
+function CanvasParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    // Disable on mobile/tablets (<768px) to keep CPU idle and mobile Lighthouse score high
-    if (window.innerWidth < 768) return
-
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -28,14 +37,13 @@ export default function ParticleBackground() {
     const particles: Particle[] = []
 
     const colors = [
-      'rgba(37,99,235,',   // Sapphire blue
-      'rgba(96,165,250,',  // Light blue
-      'rgba(148,163,184,', // Slate
-      'rgba(59,130,246,',  // Vivid blue
+      'rgba(37,99,235,',
+      'rgba(96,165,250,',
+      'rgba(148,163,184,',
+      'rgba(59,130,246,',
     ]
 
     const resize = () => {
-      if (window.innerWidth < 768) return
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
@@ -121,7 +129,39 @@ export default function ParticleBackground() {
       ref={canvasRef}
       id="particle-canvas"
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 opacity-60 hidden md:block"
+      className="pointer-events-none fixed inset-0 z-0 opacity-60"
     />
   )
 }
+
+export default memo(function ParticleBackground() {
+  return (
+    <>
+      {/* Desktop: canvas-based animated particles */}
+      <div className="hidden md:block">
+        <CanvasParticles />
+      </div>
+
+      {/* Mobile: pure CSS animated particles — zero CPU, beautiful look */}
+      <div
+        aria-hidden="true"
+        className="md:hidden pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      >
+        {CSS_PARTICLES.map((p) => (
+          <span
+            key={p.id}
+            className="absolute rounded-full"
+            style={{
+              left: p.left,
+              top: p.top,
+              width: p.size,
+              height: p.size,
+              background: `rgba(${p.color},${p.opacity})`,
+              animation: `mobilePulse ${p.duration} ${p.delay} ease-in-out infinite alternate`,
+            }}
+          />
+        ))}
+      </div>
+    </>
+  )
+})
