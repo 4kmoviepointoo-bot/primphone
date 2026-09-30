@@ -419,7 +419,7 @@ export default function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <nav className="flex flex-col py-4 px-6 gap-4">
+            <nav className="flex flex-col py-4 px-6 gap-1">
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.href}
@@ -429,7 +429,7 @@ export default function Navbar() {
                 >
                   <Link
                     to={link.href}
-                    className="font-mono text-sm text-slate-600 hover:text-primary transition-colors uppercase tracking-widest"
+                    className="font-mono text-sm text-slate-600 hover:text-primary transition-colors uppercase tracking-widest flex items-center min-h-[44px] px-2"
                     onClick={() => setMenuOpen(false)}
                   >
                     {link.label}
@@ -438,7 +438,7 @@ export default function Navbar() {
               ))}
 
               {/* Mobile Series Section */}
-              <div className="pt-3 border-t border-slate-100 space-y-1">
+              <div className="pt-3 border-t border-slate-100 space-y-0.5 mt-2">
                 <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 block mb-1">
                   Pixel Series
                 </span>
@@ -446,7 +446,7 @@ export default function Navbar() {
                   <Link
                     key={c.href}
                     to={c.href}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-mono text-slate-600 hover:text-primary hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-3 rounded-xl text-xs font-mono text-slate-600 hover:text-primary hover:bg-slate-50 transition-colors min-h-[44px]"
                     onClick={() => setMenuOpen(false)}
                   >
                     {c.icon}
@@ -456,15 +456,15 @@ export default function Navbar() {
               </div>
 
               {/* Mobile Policies & Legal Section */}
-              <div className="pt-3 border-t border-slate-100 space-y-1">
+              <div className="pt-3 border-t border-slate-100 space-y-0.5 mt-2">
                 <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 block mb-1">
-                  Policies & Legal
+                  Policies &amp; Legal
                 </span>
                 {policyLinks.map((p) => (
                   <Link
                     key={p.href}
                     to={p.href}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-mono text-slate-600 hover:text-primary hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-3 rounded-xl text-xs font-mono text-slate-600 hover:text-primary hover:bg-slate-50 transition-colors min-h-[44px]"
                     onClick={() => setMenuOpen(false)}
                   >
                     {p.icon}
@@ -479,7 +479,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: (navLinks.length + 1) * 0.05 }}
                   onClick={() => { openAuthModal(); setMenuOpen(false) }}
-                  className="btn-primary py-2.5 px-6 rounded-full text-sm self-start shadow-md shadow-primary/20 mt-2"
+                  className="btn-primary py-3 px-8 rounded-full text-sm self-start shadow-md shadow-primary/20 mt-3 min-h-[48px]"
                 >
                   Sign In
                 </motion.button>
