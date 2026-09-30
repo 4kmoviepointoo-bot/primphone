@@ -74,27 +74,6 @@ export default function ProductCard({ product, index = 0 }: Props) {
     >
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-b from-white to-slate-50 border border-slate-200 shadow-card hover:shadow-card-hover transition-shadow duration-500">
 
-        {/* Badge */}
-        {Boolean(product.badge && product.badge.trim()) && (
-          <div className="absolute top-4 left-4 z-10">
-            <span
-              className="badge text-primary bg-white/90 backdrop-blur-xs border border-primary/30 px-2.5 py-1 rounded-full shadow-xs"
-              style={{ fontSize: '0.65rem', letterSpacing: '0.12em' }}
-            >
-              {product.badge.trim()}
-            </span>
-          </div>
-        )}
-
-        {/* Discount tag */}
-        {Boolean(discount) && (
-          <div className="absolute top-4 right-4 z-10">
-            <span className="badge bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-full shadow-xs">
-              -{discount}%
-            </span>
-          </div>
-        )}
-
         {/* Phone image area */}
         <div className="relative h-64 flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 to-white/60">
           {/* Glow blob */}
@@ -109,9 +88,9 @@ export default function ProductCard({ product, index = 0 }: Props) {
             />
           </motion.div>
 
-          {/* 3D Phone Image */}
+          {/* 3D Phone Image with top clearance */}
           <motion.div
-            className="relative z-10 w-full h-full p-4 flex items-center justify-center"
+            className="relative z-10 w-full h-full pt-8 pb-3 px-6 flex items-center justify-center"
             animate={{
               y: isHovered ? -8 : 0,
               scale: isHovered ? 1.05 : 1,
@@ -124,9 +103,34 @@ export default function ProductCard({ product, index = 0 }: Props) {
               alt={product.name} 
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300"
+              className="max-h-full max-w-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-transform duration-300"
             />
           </motion.div>
+
+          {/* Floating Badges Layer - Guaranteed above image via z-30 & translateZ */}
+          <div 
+            className="absolute top-3.5 inset-x-3.5 z-30 flex items-center justify-between pointer-events-none"
+            style={{ transform: 'translateZ(40px)' }}
+          >
+            <div>
+              {Boolean(product.badge && product.badge.trim()) && (
+                <span
+                  className="badge text-primary bg-white/95 backdrop-blur-md border border-slate-200/90 px-2.5 py-1 rounded-full shadow-sm font-semibold pointer-events-auto"
+                  style={{ fontSize: '0.68rem', letterSpacing: '0.08em' }}
+                >
+                  {product.badge.trim()}
+                </span>
+              )}
+            </div>
+
+            <div>
+              {Boolean(discount) && (
+                <span className="badge bg-rose-50/95 text-rose-600 border border-rose-200/90 px-2.5 py-1 rounded-full shadow-sm font-bold pointer-events-auto text-xs">
+                  -{discount}%
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Info */}
