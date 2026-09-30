@@ -239,7 +239,7 @@ export default function Home() {
                 className="relative"
               >
                 <motion.div
-                  animate={{ y: [0, -12, 0], rotateY: [3, -3, 3] }}
+                  animate={typeof window !== 'undefined' && window.innerWidth >= 1024 ? { y: [0, -12, 0], rotateY: [3, -3, 3] } : { y: [0, -6, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
                   style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
                 >
@@ -516,6 +516,7 @@ function HeroPhone() {
         height="420"
         loading="eager"
         decoding="async"
+        fetchPriority="high"
         className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
         onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-phone.png' }}
       />

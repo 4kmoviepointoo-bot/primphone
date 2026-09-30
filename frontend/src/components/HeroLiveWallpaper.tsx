@@ -1,11 +1,18 @@
-import { useEffect, useRef, lazy, Suspense } from 'react'
+import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 
 const FloatingLines = lazy(() => import('./FloatingLines'))
 
 export default function HeroLiveWallpaper() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
+    // Only run WebGL and 60fps canvas loop on desktop screens (>=1024px)
+    // On mobile, Lighthouse throttles CPU 4x; skipping heavy JS/WebGL eliminates ~2000ms TBT!
+    const isDesk = window.innerWidth >= 1024
+    setIsDesktop(isDesk)
+    if (!isDesk) return
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -208,33 +215,45 @@ export default function HeroLiveWallpaper() {
 
   return (
     <div className="absolute inset-0 overflow-hidden select-none pointer-events-none">
-      {/* 1. Underlying Google Pixel Fluid Aurora Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-85 transition-opacity duration-1000"
+      {/* 0. Mobile CSS Aurora: Ultra-smooth, zero-CPU instant paint */}
+      <div 
+        className="absolute inset-0 lg:hidden pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 30%, rgba(37, 99, 235, 0.16), rgba(96, 165, 250, 0.08) 55%, transparent 80%)'
+        }}
       />
 
-      {/* 2. Soft Frosted Glass Mesh Diffusion */}
-      <div className="absolute inset-0 backdrop-blur-[40px] bg-white/10 pointer-events-none" />
+      {/* 1. Underlying Google Pixel Fluid Aurora Canvas (Desktop only) */}
+      {isDesktop && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full opacity-85 transition-opacity duration-1000 hidden lg:block"
+        />
+      )}
 
-      {/* 3. React Bits Three.js FloatingLines Live Animated Canvas */}
-      <div className="absolute inset-0 pointer-events-auto">
-        <Suspense fallback={null}>
-          <FloatingLines
-            enabledWaves={['top', 'middle', 'bottom']}
-            lineCount={[10, 15, 20]}
-            lineDistance={[8, 6, 4]}
-            bendRadius={5.0}
-            bendStrength={-0.5}
-            interactive={true}
-            parallax={true}
-            parallaxStrength={0.12}
-            linesGradient={['#2563EB', '#3B82F6', '#60A5FA', '#818CF8', '#38BDF8']}
-            lightMode={true}
-            animationSpeed={0.9}
-          />
-        </Suspense>
-      </div>
+      {/* 2. Soft Frosted Glass Mesh Diffusion */}
+      <div className="absolute inset-0 backdrop-blur-[30px] bg-white/10 pointer-events-none" />
+
+      {/* 3. React Bits Three.js FloatingLines Live Animated Canvas (Desktop only) */}
+      {isDesktop && (
+        <div className="absolute inset-0 pointer-events-auto hidden lg:block">
+          <Suspense fallback={null}>
+            <FloatingLines
+              enabledWaves={['top', 'middle', 'bottom']}
+              lineCount={[10, 15, 20]}
+              lineDistance={[8, 6, 4]}
+              bendRadius={5.0}
+              bendStrength={-0.5}
+              interactive={true}
+              parallax={true}
+              parallaxStrength={0.12}
+              linesGradient={['#2563EB', '#3B82F6', '#60A5FA', '#818CF8', '#38BDF8']}
+              lightMode={true}
+              animationSpeed={0.9}
+            />
+          </Suspense>
+        </div>
+      )}
 
       {/* 4. Subtle Luxury Geometric Grid Line Watermark */}
       <div

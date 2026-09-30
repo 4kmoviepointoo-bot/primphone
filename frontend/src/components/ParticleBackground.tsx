@@ -16,6 +16,9 @@ export default function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
+    // Disable on mobile/tablets (<768px) to keep CPU idle and mobile Lighthouse score high
+    if (window.innerWidth < 768) return
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -32,13 +35,14 @@ export default function ParticleBackground() {
     ]
 
     const resize = () => {
+      if (window.innerWidth < 768) return
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
 
-    const maxParticles = window.innerWidth < 768 ? 12 : 24
+    const maxParticles = 24
 
     const spawn = () => {
       if (particles.length > maxParticles) return
@@ -117,7 +121,7 @@ export default function ParticleBackground() {
       ref={canvasRef}
       id="particle-canvas"
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 opacity-60"
+      className="pointer-events-none fixed inset-0 z-0 opacity-60 hidden md:block"
     />
   )
 }
