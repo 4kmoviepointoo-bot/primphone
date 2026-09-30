@@ -420,6 +420,56 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
           >
             <nav className="flex flex-col py-4 px-6 gap-1">
+
+              {/* ── CTA Section at top ── */}
+              {user ? (
+                /* Logged in: greet user */
+                <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-2xl bg-primary/5 border border-primary/10">
+                  <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800 font-mono">{user.name}</p>
+                    <p className="text-[10px] text-slate-400 font-mono truncate">{user.email}</p>
+                  </div>
+                </div>
+              ) : (
+                /* Guest: Show Sign In + Sign Up CTAs */
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                  className="flex flex-col gap-2 mb-3 pb-4 border-b border-slate-100"
+                >
+                  <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest px-1 mb-1">
+                    Your Account
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { openAuthModal('login'); setMenuOpen(false) }}
+                      className="flex-1 py-3 rounded-full text-sm font-bold font-mono border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all min-h-[48px]"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => { openAuthModal('register'); setMenuOpen(false) }}
+                      className="flex-1 btn-primary py-3 rounded-full text-sm font-bold min-h-[48px] shadow-md shadow-primary/25"
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                  {/* Shop CTA */}
+                  <Link
+                    to="/shop"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold font-mono bg-slate-900 text-white hover:bg-slate-700 transition-all min-h-[48px] shadow-md mt-1"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Shop All Phones
+                  </Link>
+                </motion.div>
+              )}
+
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.href}
@@ -473,16 +523,25 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {!user && (
-                <motion.button
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (navLinks.length + 1) * 0.05 }}
-                  onClick={() => { openAuthModal(); setMenuOpen(false) }}
-                  className="btn-primary py-3 px-8 rounded-full text-sm self-start shadow-md shadow-primary/20 mt-3 min-h-[48px]"
-                >
-                  Sign In
-                </motion.button>
+              {/* Logged-in user: Sign Out at bottom */}
+              {user && (
+                <div className="pt-3 border-t border-slate-100 mt-2 flex flex-col gap-2">
+                  <Link
+                    to="/shop"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold font-mono bg-slate-900 text-white hover:bg-slate-700 transition-all min-h-[48px] shadow-md"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Shop All Phones
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setMenuOpen(false) }}
+                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-mono text-red-500 hover:bg-red-50 transition-all min-h-[44px] border border-red-100"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
               )}
             </nav>
           </motion.div>
