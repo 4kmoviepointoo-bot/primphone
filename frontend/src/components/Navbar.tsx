@@ -458,15 +458,14 @@ export default function Navbar() {
                       Sign Up
                     </button>
                   </div>
-                  {/* Shop CTA */}
-                  <Link
-                    to="/shop"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold font-mono bg-slate-900 text-white hover:bg-slate-700 transition-all min-h-[48px] shadow-md mt-1"
+                  {/* Shop CTA — opens register so user creates account before buying */}
+                  <button
+                    onClick={() => { openAuthModal('register'); setMenuOpen(false) }}
+                    className="flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold font-mono bg-slate-900 text-white hover:bg-slate-700 transition-all min-h-[48px] shadow-md mt-1 w-full"
                   >
                     <ShoppingBag className="w-4 h-4" />
-                    Shop All Phones
-                  </Link>
+                    Start Shopping — Create Account
+                  </button>
                 </motion.div>
               )}
 
