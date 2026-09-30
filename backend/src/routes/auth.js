@@ -11,8 +11,8 @@ const router = express.Router();
  * Generate a short-lived access token (15m) and a long-lived refresh token (7d).
  */
 function generateTokens(payload) {
-  const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m', algorithms: ['HS256'] });
-  const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d', algorithms: ['HS256'] });
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m', algorithm: 'HS256' });
+  const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d', algorithm: 'HS256' });
   return { accessToken, refreshToken };
 }
 
@@ -145,8 +145,8 @@ router.post('/refresh', (req, res) => {
     }
 
     const payload = { id: user.id, email: user.email, role: user.role };
-    const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m', algorithms: ['HS256'] });
-    const newRefreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d', algorithms: ['HS256'] });
+    const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m', algorithm: 'HS256' });
+    const newRefreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d', algorithm: 'HS256' });
     setTokenCookies(res, newAccessToken, newRefreshToken);
 
     return res.json({ message: 'Token refreshed' });

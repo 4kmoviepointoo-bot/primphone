@@ -9,8 +9,8 @@ const router = express.Router();
 function generateTokens(payload) {
   const jwtSecret = process.env.JWT_SECRET || 'primphone_super_secret_jwt_key_2024_production_ready';
   const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'primphone_refresh_secret_2024_production_ready';
-  const accessToken = jwt.sign(payload, jwtSecret, { expiresIn: '15m', algorithms: ['HS256'] });
-  const refreshToken = jwt.sign(payload, jwtRefreshSecret, { expiresIn: '7d', algorithms: ['HS256'] });
+  const accessToken = jwt.sign(payload, jwtSecret, { expiresIn: '15m', algorithm: 'HS256' });
+  const refreshToken = jwt.sign(payload, jwtRefreshSecret, { expiresIn: '7d', algorithm: 'HS256' });
   return { accessToken, refreshToken };
 }
 
