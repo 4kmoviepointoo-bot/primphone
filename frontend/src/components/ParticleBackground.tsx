@@ -12,17 +12,28 @@ interface Particle {
   maxLife: number
 }
 
-// Pure CSS particles for mobile — zero canvas, zero rAF, zero CPU
-const CSS_PARTICLES = Array.from({ length: 14 }, (_, i) => ({
-  id: i,
-  left: `${6 + (i * 6.5) % 88}%`,
-  top: `${5 + (i * 7.3) % 85}%`,
-  size: 2 + (i % 3),
-  delay: `${(i * 0.55).toFixed(2)}s`,
-  duration: `${4 + (i % 4)}s`,
-  color: i % 3 === 0 ? '37,99,235' : i % 3 === 1 ? '96,165,250' : '148,163,184',
-  opacity: 0.18 + (i % 4) * 0.06,
-}))
+// Glowing particle dots for mobile — zero canvas, zero JS loop, pure GPU CSS
+const CSS_PARTICLES = [
+  // Large glow orbs (background aurora blobs)
+  { id: 'orb1', left: '15%',  top: '20%',  size: 90,  blur: 55, color: '37,99,235',   opacity: 0.13, duration: '8s',  delay: '0s',   type: 'orb' },
+  { id: 'orb2', left: '70%',  top: '35%',  size: 120, blur: 70, color: '96,165,250',  opacity: 0.10, duration: '10s', delay: '2s',   type: 'orb' },
+  { id: 'orb3', left: '45%',  top: '70%',  size: 100, blur: 60, color: '129,140,248', opacity: 0.09, duration: '12s', delay: '4s',   type: 'orb' },
+  { id: 'orb4', left: '5%',   top: '65%',  size: 70,  blur: 45, color: '56,189,248',  opacity: 0.08, duration: '9s',  delay: '1s',   type: 'orb' },
+  { id: 'orb5', left: '80%',  top: '75%',  size: 80,  blur: 50, color: '167,243,208', opacity: 0.08, duration: '11s', delay: '3s',   type: 'orb' },
+  // Medium glow dots
+  { id: 'd1',  left: '8%',   top: '12%',  size: 6,   blur: 6,  color: '37,99,235',   opacity: 0.55, duration: '5s',  delay: '0s',   type: 'dot' },
+  { id: 'd2',  left: '88%',  top: '18%',  size: 5,   blur: 5,  color: '96,165,250',  opacity: 0.50, duration: '6s',  delay: '1.2s', type: 'dot' },
+  { id: 'd3',  left: '25%',  top: '8%',   size: 4,   blur: 4,  color: '59,130,246',  opacity: 0.45, duration: '7s',  delay: '0.5s', type: 'dot' },
+  { id: 'd4',  left: '65%',  top: '15%',  size: 7,   blur: 7,  color: '37,99,235',   opacity: 0.50, duration: '5s',  delay: '2s',   type: 'dot' },
+  { id: 'd5',  left: '50%',  top: '5%',   size: 4,   blur: 4,  color: '129,140,248', opacity: 0.40, duration: '8s',  delay: '0.8s', type: 'dot' },
+  { id: 'd6',  left: '92%',  top: '45%',  size: 5,   blur: 5,  color: '96,165,250',  opacity: 0.45, duration: '6s',  delay: '3s',   type: 'dot' },
+  { id: 'd7',  left: '3%',   top: '48%',  size: 6,   blur: 6,  color: '37,99,235',   opacity: 0.50, duration: '7s',  delay: '1.5s', type: 'dot' },
+  { id: 'd8',  left: '78%',  top: '55%',  size: 4,   blur: 4,  color: '56,189,248',  opacity: 0.40, duration: '5s',  delay: '2.5s', type: 'dot' },
+  { id: 'd9',  left: '38%',  top: '82%',  size: 5,   blur: 5,  color: '37,99,235',   opacity: 0.45, duration: '9s',  delay: '0.3s', type: 'dot' },
+  { id: 'd10', left: '15%',  top: '88%',  size: 3,   blur: 3,  color: '96,165,250',  opacity: 0.35, duration: '6s',  delay: '4s',   type: 'dot' },
+  { id: 'd11', left: '60%',  top: '90%',  size: 5,   blur: 5,  color: '59,130,246',  opacity: 0.45, duration: '7s',  delay: '1s',   type: 'dot' },
+  { id: 'd12', left: '42%',  top: '42%',  size: 3,   blur: 3,  color: '129,140,248', opacity: 0.30, duration: '8s',  delay: '2.2s', type: 'dot' },
+]
 
 function CanvasParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -142,25 +153,46 @@ export default memo(function ParticleBackground() {
         <CanvasParticles />
       </div>
 
-      {/* Mobile: pure CSS animated particles — zero CPU, beautiful look */}
+      {/* Mobile: pure CSS animated particles — aurora orbs + glowing dots, zero CPU */}
       <div
         aria-hidden="true"
         className="md:hidden pointer-events-none fixed inset-0 z-0 overflow-hidden"
       >
-        {CSS_PARTICLES.map((p) => (
-          <span
-            key={p.id}
-            className="absolute rounded-full"
-            style={{
-              left: p.left,
-              top: p.top,
-              width: p.size,
-              height: p.size,
-              background: `rgba(${p.color},${p.opacity})`,
-              animation: `mobilePulse ${p.duration} ${p.delay} ease-in-out infinite alternate`,
-            }}
-          />
-        ))}
+        {CSS_PARTICLES.map((p) =>
+          p.type === 'orb' ? (
+            /* Large blurred aurora blobs */
+            <span
+              key={p.id}
+              className="absolute rounded-full"
+              style={{
+                left: p.left,
+                top: p.top,
+                width: p.size,
+                height: p.size,
+                background: `radial-gradient(circle, rgba(${p.color},${p.opacity}) 0%, transparent 70%)`,
+                filter: `blur(${p.blur}px)`,
+                transform: 'translate(-50%, -50%)',
+                animation: `mobileOrb ${p.duration} ${p.delay} ease-in-out infinite alternate`,
+              }}
+            />
+          ) : (
+            /* Small glowing particle dots */
+            <span
+              key={p.id}
+              className="absolute rounded-full"
+              style={{
+                left: p.left,
+                top: p.top,
+                width: p.size,
+                height: p.size,
+                background: `rgba(${p.color},${p.opacity})`,
+                boxShadow: `0 0 ${p.blur * 2}px ${p.blur}px rgba(${p.color},${p.opacity * 0.6})`,
+                transform: 'translate(-50%, -50%)',
+                animation: `mobilePulse ${p.duration} ${p.delay} ease-in-out infinite alternate`,
+              }}
+            />
+          )
+        )}
       </div>
     </>
   )

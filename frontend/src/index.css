@@ -300,7 +300,15 @@ body {
 
 /* ─── Mobile CSS particle pulse (zero CPU, hardware GPU only) ── */
 @keyframes mobilePulse {
-  0%   { opacity: 0.1; transform: translateY(0) scale(1); }
-  50%  { opacity: 0.5; transform: translateY(-8px) scale(1.4); }
-  100% { opacity: 0.1; transform: translateY(0) scale(1); }
+  0%   { opacity: 0.1; transform: translate(-50%, -50%) scale(1); }
+  50%  { opacity: 0.7; transform: translate(-50%, -58%) scale(1.5); }
+  100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ─── Mobile aurora orb float ───────────────────────────────── */
+@keyframes mobileOrb {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: 0.6; }
+  33%  { transform: translate(-44%, -57%) scale(1.1);  opacity: 0.9; }
+  66%  { transform: translate(-56%, -46%) scale(0.95); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.8; }
 }
