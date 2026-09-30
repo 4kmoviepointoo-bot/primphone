@@ -7,7 +7,7 @@ export interface Product {
   brand: string
   model: string
   price: number
-  original_price?: number
+  original_price?: number | null
   storage: string
   ram: string
   color: string

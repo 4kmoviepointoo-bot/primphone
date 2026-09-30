@@ -23,12 +23,30 @@ function parseProduct(row) {
  */
 router.get('/', optionalAuth, (req, res) => {
   try {
-    const { featured, search, brand, minPrice, maxPrice, sort } = req.query;
+    const { featured, search, brand, minPrice, maxPrice, sort, category } = req.query;
 
     let query = 'SELECT * FROM products WHERE 1=1';
     const params = [];
 
-    if (featured === 'true') {
+    // Category-specific filtering
+    if (category) {
+      const cat = category.toLowerCase().trim();
+      if (cat === 'pixel-9') {
+        query += " AND (model LIKE 'Pixel 9%' OR name LIKE 'Pixel 9%') AND name NOT LIKE '%Fold%' AND model NOT LIKE '%Fold%' AND model NOT LIKE '%9a%'";
+      } else if (cat === 'foldable' || cat === 'foldables') {
+        query += " AND (badge = 'Foldable' OR name LIKE '%Fold%' OR model LIKE '%Fold%')";
+      } else if (cat === 'pixel-8') {
+        query += " AND (model LIKE 'Pixel 8%' OR name LIKE 'Pixel 8%') AND model NOT LIKE '%8a%' AND name NOT LIKE '%8a%'";
+      } else if (cat === 'a-series' || cat === 'pixel-a') {
+        query += " AND (badge = 'A-Series' OR model LIKE '%9a%' OR model LIKE '%8a%' OR model LIKE '%7a%' OR model LIKE '%6a%')";
+      } else if (cat === 'sale' || cat === 'special-offers') {
+        query += " AND (badge = 'Sale' OR original_price IS NOT NULL)";
+      } else if (cat === 'featured') {
+        query += ' AND featured = 1';
+      }
+    }
+
+    if (featured === 'true' && !category) {
       query += ' AND featured = 1';
     }
 
@@ -43,15 +61,32 @@ router.get('/', optionalAuth, (req, res) => {
       params.push(`%${brand.trim()}%`);
     }
 
-    if (req.query.badge && req.query.badge.trim()) {
-      query += ' AND badge LIKE ?';
-      params.push(`%${req.query.badge.trim()}%`);
+    if (req.query.badge && req.query.badge.trim() && !category) {
+      const b = req.query.badge.trim();
+      if (b.toLowerCase() === 'sale') {
+        query += " AND (badge = 'Sale' OR original_price IS NOT NULL)";
+      } else if (b.toLowerCase() === 'foldable') {
+        query += " AND (badge = 'Foldable' OR name LIKE '%Fold%' OR model LIKE '%Fold%')";
+      } else if (b.toLowerCase() === 'a-series') {
+        query += " AND (badge = 'A-Series' OR model LIKE '%9a%' OR model LIKE '%8a%' OR model LIKE '%7a%' OR model LIKE '%6a%')";
+      } else {
+        query += ' AND badge LIKE ?';
+        params.push(`%${b}%`);
+      }
     }
 
-    if (req.query.series && req.query.series.trim()) {
-      query += ' AND (model LIKE ? OR name LIKE ?)';
-      const s = `%${req.query.series.trim()}%`;
-      params.push(s, s);
+    if (req.query.series && req.query.series.trim() && !category) {
+      const s = req.query.series.trim();
+      if (s === 'Pixel 9') {
+        query += " AND (model LIKE 'Pixel 9%' OR name LIKE 'Pixel 9%') AND name NOT LIKE '%Fold%' AND model NOT LIKE '%Fold%' AND model NOT LIKE '%9a%'";
+      } else if (s === 'Pixel 8') {
+        query += " AND (model LIKE 'Pixel 8%' OR name LIKE 'Pixel 8%') AND model NOT LIKE '%8a%' AND name NOT LIKE '%8a%'";
+      } else if (s === 'Pixel A-Series' || s === 'a-series') {
+        query += " AND (badge = 'A-Series' OR model LIKE '%9a%' OR model LIKE '%8a%' OR model LIKE '%7a%' OR model LIKE '%6a%')";
+      } else {
+        query += ' AND (model LIKE ? OR name LIKE ?)';
+        params.push(`%${s}%`, `%${s}%`);
+      }
     }
 
     if (minPrice !== undefined && !isNaN(parseFloat(minPrice))) {
@@ -84,7 +119,7 @@ router.get('/', optionalAuth, (req, res) => {
 
     // Pagination
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 50));
     const offset = (page - 1) * limit;
 
     const countRow = db.prepare('SELECT COUNT(*) AS count FROM (' + query + ')').get(...params);

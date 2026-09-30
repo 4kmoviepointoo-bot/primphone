@@ -4,12 +4,25 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '..', 'primphone.db');
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DB_PATH = isVercel
+  ? path.join('/tmp', 'primphone.db')
+  : path.join(__dirname, '..', 'primphone.db');
+
 const db = new DatabaseSync(DB_PATH);
 
-// Enable WAL + foreign keys
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
+// Enable WAL + foreign keys resiliently
+try {
+  db.exec('PRAGMA journal_mode = WAL;');
+} catch {
+  try {
+    db.exec('PRAGMA journal_mode = MEMORY;');
+  } catch {}
+}
+
+try {
+  db.exec('PRAGMA foreign_keys = ON;');
+} catch {}
 
 function initialize() {
   db.exec(`
@@ -88,88 +101,13 @@ function seedProducts() {
       (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  const products = [
-    {
-      id: uuidv4(), name: 'Pixel 9 Pro', brand: 'Google', model: 'Pixel 9 Pro',
-      price: 1199, original_price: null, storage: '256GB', ram: '12GB', color: 'Obsidian',
-      description: 'The most pro Pixel ever. With the best camera system in a Pixel phone, all-new Pixel Camera features, Gemini AI on device, and long-lasting battery.',
-      specs: JSON.stringify({ display: '6.3 inch LTPO OLED', processor: 'Google Tensor G4', battery: '4700 mAh', camera: '50MP + 48MP + 48MP', os: 'Android 15', charging: '45W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-1.jpg',
-      badge: 'New', rating: 4.9, review_count: 2847, featured: 1,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 9 Pro XL', brand: 'Google', model: 'Pixel 9 Pro XL',
-      price: 1299, original_price: null, storage: '256GB', ram: '16GB', color: 'Porcelain',
-      description: 'The biggest, most powerful Pixel. Expansive display, massive battery, and the complete pro camera suite.',
-      specs: JSON.stringify({ display: '6.8 inch LTPO OLED', processor: 'Google Tensor G4', battery: '5060 mAh', camera: '50MP + 48MP + 48MP', os: 'Android 15', charging: '45W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-xl-1.jpg',
-      badge: 'New', rating: 4.9, review_count: 1923, featured: 1,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 9', brand: 'Google', model: 'Pixel 9',
-      price: 999, original_price: null, storage: '128GB', ram: '12GB', color: 'Wintergreen',
-      description: 'Meet Pixel 9. A fresh new look with Gemini AI built in, powerful camera, and all-day battery life.',
-      specs: JSON.stringify({ display: '6.3 inch OLED', processor: 'Google Tensor G4', battery: '4700 mAh', camera: '50MP + 10.5MP', os: 'Android 15', charging: '27W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-1.jpg',
-      badge: 'New', rating: 4.8, review_count: 3241, featured: 1,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 9a', brand: 'Google', model: 'Pixel 9a',
-      price: 699, original_price: null, storage: '128GB', ram: '8GB', color: 'Iris',
-      description: 'All the essentials of a Pixel at a great price. Impressive camera, long battery life, and clean Android.',
-      specs: JSON.stringify({ display: '6.1 inch OLED', processor: 'Google Tensor G4', battery: '5100 mAh', camera: '48MP + 13MP', os: 'Android 15', charging: '18W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9a-1.jpg',
-      badge: 'Best Value', rating: 4.7, review_count: 1456, featured: 0,
-    },
-    {
-      id: uuidv4(), name: 'Pixel Fold 2', brand: 'Google', model: 'Pixel Fold 2',
-      price: 1799, original_price: null, storage: '256GB', ram: '16GB', color: 'Obsidian',
-      description: 'Unfold your world. The ultimate foldable phone with a seamless hinge, outer and inner displays, and pro-grade cameras.',
-      specs: JSON.stringify({ display: '8.0 inch inner + 6.3 inch outer OLED', processor: 'Google Tensor G3', battery: '4650 mAh', camera: '48MP + 10.8MP + 10.8MP', os: 'Android 15', charging: '30W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-9-pro-fold-1.jpg',
-      badge: 'Foldable', rating: 4.8, review_count: 987, featured: 1,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 8 Pro', brand: 'Google', model: 'Pixel 8 Pro',
-      price: 899, original_price: 1099, storage: '128GB', ram: '12GB', color: 'Bay',
-      description: 'The ultimate Pixel flagship. With Google AI, the best Pixel camera, and a stunning display.',
-      specs: JSON.stringify({ display: '6.7 inch LTPO OLED', processor: 'Google Tensor G3', battery: '5050 mAh', camera: '50MP + 48MP + 48MP', os: 'Android 14', charging: '30W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-8-pro-1.jpg',
-      badge: 'Sale', rating: 4.8, review_count: 4123, featured: 0,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 8', brand: 'Google', model: 'Pixel 8',
-      price: 699, original_price: 799, storage: '128GB', ram: '8GB', color: 'Rose',
-      description: 'The power of Google AI in a sleek, compact design. Magic Eraser, Call Screen, and more.',
-      specs: JSON.stringify({ display: '6.2 inch OLED', processor: 'Google Tensor G3', battery: '4575 mAh', camera: '50MP + 12MP', os: 'Android 14', charging: '27W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-8-1.jpg',
-      badge: 'Sale', rating: 4.7, review_count: 5678, featured: 0,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 8a', brand: 'Google', model: 'Pixel 8a',
-      price: 599, original_price: null, storage: '128GB', ram: '8GB', color: 'Obsidian',
-      description: 'A-series meets Tensor G3. Great camera, long battery life, and Google AI at an accessible price.',
-      specs: JSON.stringify({ display: '6.1 inch OLED', processor: 'Google Tensor G3', battery: '4492 mAh', camera: '64MP + 13MP', os: 'Android 14', charging: '18W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel-8a-1.jpg',
-      badge: 'Popular', rating: 4.7, review_count: 2345, featured: 0,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 7 Pro', brand: 'Google', model: 'Pixel 7 Pro',
-      price: 599, original_price: 899, storage: '128GB', ram: '12GB', color: 'Hazel',
-      description: 'A sophisticated design, an advanced camera system, and Google Tensor G2 chip.',
-      specs: JSON.stringify({ display: '6.7 inch LTPO OLED', processor: 'Google Tensor G2', battery: '5000 mAh', camera: '50MP + 48MP + 12MP', os: 'Android 14', charging: '30W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel7-pro-1.jpg',
-      badge: 'Classic', rating: 4.6, review_count: 6789, featured: 0,
-    },
-    {
-      id: uuidv4(), name: 'Pixel 7', brand: 'Google', model: 'Pixel 7',
-      price: 399, original_price: 599, storage: '128GB', ram: '8GB', color: 'Lemongrass',
-      description: 'The everyday flagship. Google Tensor G2, upgraded cameras, and all-day battery in a refined design.',
-      specs: JSON.stringify({ display: '6.3 inch OLED', processor: 'Google Tensor G2', battery: '4355 mAh', camera: '50MP + 12MP', os: 'Android 14', charging: '20W Wired' }),
-      stock: 10, image_url: 'https://fdn2.gsmarena.com/vv/pics/google/google-pixel7-1.jpg',
-      badge: 'Classic', rating: 4.5, review_count: 8912, featured: 0,
-    },
-  ];
+  let products = [];
+  try {
+    const seedModule = require('../seedAll');
+    products = seedModule.products || [];
+  } catch (err) {
+    console.error('Error importing seedAll products:', err);
+  }
 
   for (const p of products) {
     insert.run(
@@ -178,7 +116,7 @@ function seedProducts() {
       p.image_url, p.badge, p.rating, p.review_count, p.featured
     );
   }
-  console.log('Seeded 10 Google Pixel products');
+  console.log(`Seeded ${products.length} Google Pixel products`);
 }
 
 function seedAdmin() {

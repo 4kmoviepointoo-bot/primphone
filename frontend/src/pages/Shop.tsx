@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, SlidersHorizontal, X, ChevronDown, Sparkles, Smartphone, Layers, Tag, Star, RotateCcw } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { fetchProducts } from '@/api/client'
+import { fetchProducts, filterFallbackProducts } from '@/api/client'
 import ProductCard from '@/components/ProductCard'
 import ScrollReveal from '@/components/ScrollReveal'
 import { type Product } from '@/store/cartStore'
@@ -24,12 +24,12 @@ const priceRanges = [
 
 const categories = [
   { id: 'all', label: 'All Devices', icon: Smartphone, queryParam: {} },
-  { id: 'pixel-9', label: 'Pixel 9 Series', icon: Sparkles, queryParam: { series: 'Pixel 9' } },
-  { id: 'foldable', label: 'Foldables', icon: Layers, queryParam: { badge: 'Foldable' } },
-  { id: 'pixel-8', label: 'Pixel 8 Series', icon: Smartphone, queryParam: { series: 'Pixel 8' } },
-  { id: 'a-series', label: 'Pixel A-Series', icon: Tag, queryParam: { search: '9a' } },
-  { id: 'sale', label: 'Special Offers', icon: Tag, queryParam: { badge: 'Sale' } },
-  { id: 'featured', label: 'Featured', icon: Star, queryParam: { featured: true } },
+  { id: 'pixel-9', label: 'Pixel 9 Series', icon: Sparkles, queryParam: { category: 'pixel-9' } },
+  { id: 'foldable', label: 'Foldables', icon: Layers, queryParam: { category: 'foldable' } },
+  { id: 'pixel-8', label: 'Pixel 8 Series', icon: Smartphone, queryParam: { category: 'pixel-8' } },
+  { id: 'a-series', label: 'Pixel A-Series', icon: Tag, queryParam: { category: 'a-series' } },
+  { id: 'sale', label: 'Special Offers', icon: Tag, queryParam: { category: 'sale' } },
+  { id: 'featured', label: 'Featured', icon: Star, queryParam: { category: 'featured' } },
 ]
 
 export default function Shop() {
@@ -37,59 +37,62 @@ export default function Shop() {
   const navigate = useNavigate()
   const query = new URLSearchParams(location.search)
 
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  // Detect active category from URL
+  const catParam = query.get('category')
+  const seriesParam = query.get('series')
+  const badgeParam = query.get('badge')
+  const featuredParam = query.get('featured') === 'true'
+
+  let initialCategory = 'all'
+  if (catParam) initialCategory = catParam
+  else if (featuredParam) initialCategory = 'featured'
+  else if (badgeParam === 'Foldable') initialCategory = 'foldable'
+  else if (badgeParam === 'Sale') initialCategory = 'sale'
+  else if (seriesParam === 'Pixel 9') initialCategory = 'pixel-9'
+  else if (seriesParam === 'Pixel 8') initialCategory = 'pixel-8'
+
+  const [products, setProducts] = useState<Product[]>(() =>
+    filterFallbackProducts({ category: initialCategory !== 'all' ? initialCategory : undefined })
+  )
+  const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState(query.get('search') || '')
   const [sort, setSort] = useState('newest')
   const [priceRange, setPriceRange] = useState(0)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [sortOpen, setSortOpen] = useState(false)
 
-  // Detect active category from URL
-  const seriesParam = query.get('series')
-  const badgeParam = query.get('badge')
-  const featuredParam = query.get('featured') === 'true'
-
-  let initialCategory = 'all'
-  if (featuredParam) initialCategory = 'featured'
-  else if (badgeParam === 'Foldable') initialCategory = 'foldable'
-  else if (badgeParam === 'Sale') initialCategory = 'sale'
-  else if (seriesParam === 'Pixel 9') initialCategory = 'pixel-9'
-  else if (seriesParam === 'Pixel 8') initialCategory = 'pixel-8'
-
   const [activeCategory, setActiveCategory] = useState(initialCategory)
 
   // Sync category state when URL changes
   useEffect(() => {
     const q = new URLSearchParams(location.search)
+    const cat = q.get('category')
     const s = q.get('series')
     const b = q.get('badge')
     const f = q.get('featured') === 'true'
     const searchVal = q.get('search') || ''
 
-    if (f) setActiveCategory('featured')
+    if (cat) setActiveCategory(cat)
+    else if (f) setActiveCategory('featured')
     else if (b === 'Foldable') setActiveCategory('foldable')
     else if (b === 'Sale') setActiveCategory('sale')
     else if (s === 'Pixel 9') setActiveCategory('pixel-9')
     else if (s === 'Pixel 8') setActiveCategory('pixel-8')
     else if (searchVal === '9a') setActiveCategory('a-series')
-    else if (!s && !b && !f) setActiveCategory('all')
+    else if (!s && !b && !f && !cat) setActiveCategory('all')
     
     setSearch(searchVal)
   }, [location.search])
 
   const load = useCallback(() => {
     setLoading(true)
-    const params: Record<string, string | boolean | number> = { sort }
+    const params: Record<string, string | boolean | number | undefined> = { sort }
     if (search) params.search = search
 
     // Category overrides
-    if (activeCategory === 'featured') params.featured = true
-    else if (activeCategory === 'pixel-9') params.series = 'Pixel 9'
-    else if (activeCategory === 'pixel-8') params.series = 'Pixel 8'
-    else if (activeCategory === 'foldable') params.badge = 'Foldable'
-    else if (activeCategory === 'sale') params.badge = 'Sale'
-    else if (activeCategory === 'a-series' && !search) params.search = 'a'
+    if (activeCategory !== 'all') {
+      params.category = activeCategory
+    }
 
     const range = priceRanges[priceRange]
     if (range.min > 0) params.minPrice = range.min
@@ -97,11 +100,16 @@ export default function Shop() {
 
     fetchProducts(params)
       .then((data) => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           setProducts(data)
+        } else {
+          setProducts(filterFallbackProducts(params))
         }
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.warn('Backend query error, using local fallback:', err)
+        setProducts(filterFallbackProducts(params))
+      })
       .finally(() => setLoading(false))
   }, [search, sort, priceRange, activeCategory])
 
@@ -116,10 +124,9 @@ export default function Shop() {
     if (!target) return
 
     const newQuery = new URLSearchParams()
-    if (target.queryParam.featured) newQuery.set('featured', 'true')
-    if (target.queryParam.series) newQuery.set('series', target.queryParam.series)
-    if (target.queryParam.badge) newQuery.set('badge', target.queryParam.badge)
-    if (target.queryParam.search) newQuery.set('search', target.queryParam.search)
+    if (catId !== 'all') {
+      newQuery.set('category', catId)
+    }
 
     navigate(`/shop${newQuery.toString() ? `?${newQuery.toString()}` : ''}`, { replace: true })
   }
