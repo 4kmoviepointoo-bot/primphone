@@ -6,8 +6,10 @@ const { generateTokens, setTokenCookies } = require('./auth');
 
 const router = express.Router();
 
+const CLIENT_ID = '933186359413-7djigk7lcuk7uqscdkc6r1e2hghikldc.apps.googleusercontent.com';
+
 const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID || '933186359413-7djigk7lcuk7uqscdkc6r1e2hghikldc.apps.googleusercontent.com',
+  CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET || '',
   process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5173/auth/google/callback'
 );
@@ -21,7 +23,7 @@ router.post('/google', async (req, res) => {
 
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID || '933186359413-7djigk7lcuk7uqscdkc6r1e2hghikldc.apps.googleusercontent.com',
+      audience: CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -48,7 +50,7 @@ router.post('/google', async (req, res) => {
     });
   } catch (err) {
     console.error('Google auth error:', err);
-    return res.status(401).json({ error: 'Google authentication failed' });
+    return res.status(401).json({ error: 'Google authentication failed: ' + (err.message || String(err)) });
   }
 });
 

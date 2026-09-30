@@ -165,9 +165,7 @@ export default function AuthModal() {
                     closeAuthModal()
                     setFormData({ name: '', email: '', password: '' })
                   } catch (err: unknown) {
-                    const msg = err instanceof Error
-                      ? err.message
-                      : (err as any)?.response?.data?.message || 'Google sign-in failed.'
+                    const msg = (err as any)?.response?.data?.error || (err as any)?.response?.data?.message || (err instanceof Error ? err.message : 'Google sign-in failed.');
                     setError(msg)
                   } finally {
                     setLoading(false)
