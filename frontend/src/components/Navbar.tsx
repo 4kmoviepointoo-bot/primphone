@@ -413,7 +413,7 @@ export default function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-slate-100 shadow-lg"
+            className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-slate-100 shadow-lg pointer-events-auto"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
