@@ -1,4 +1,3 @@
-const { db } = require('./src/db');
 const { v4: uuidv4 } = require('uuid');
 
 const products = [
@@ -414,6 +413,7 @@ const products = [
 ];
 
 function seed() {
+  const { db } = require('./src/db');
   db.exec('PRAGMA foreign_keys = OFF;');
   db.prepare('DELETE FROM reviews').run();
   db.prepare('DELETE FROM products').run();
