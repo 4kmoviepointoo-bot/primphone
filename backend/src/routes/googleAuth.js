@@ -1,10 +1,34 @@
 const express = require('express');
 const { OAuth2Client } = require('google-auth-library');
+const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../db');
-const { generateTokens, setTokenCookies } = require('./auth');
 
 const router = express.Router();
+
+function generateTokens(payload) {
+  const jwtSecret = process.env.JWT_SECRET || 'primphone_super_secret_jwt_key_2024_production_ready';
+  const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'primphone_refresh_secret_2024_production_ready';
+  const accessToken = jwt.sign(payload, jwtSecret, { expiresIn: '15m', algorithms: ['HS256'] });
+  const refreshToken = jwt.sign(payload, jwtRefreshSecret, { expiresIn: '7d', algorithms: ['HS256'] });
+  return { accessToken, refreshToken };
+}
+
+function setTokenCookies(res, accessToken, refreshToken) {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 15 * 60 * 1000,
+  });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
 
 const CLIENT_ID = '933186359413-7djigk7lcuk7uqscdkc6r1e2hghikldc.apps.googleusercontent.com';
 
