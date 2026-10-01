@@ -7,11 +7,22 @@ const api = axios.create({
   withCredentials: true,
 })
 
+// Attach Bearer token to all outgoing requests
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
 // Handle 401 globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || ''
+    // Only logout if not an auth attempt
+    if (error.response?.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/register') && !url.includes('/auth/google')) {
       useAuthStore.getState().logout()
     }
     return Promise.reject(error)
@@ -136,18 +147,30 @@ export const submitProductReview = (id: string, payload: { user_name: string; ra
 
 // ── Auth helpers ──────────────────────────────────────────
 export const login = (email: string, password: string) =>
-  api.post('/auth/login', { email, password }).then((r) => r.data.user)
+  api.post('/auth/login', { email, password }).then((r) => ({
+    user: r.data.user,
+    token: r.data.token || r.data.accessToken,
+  }))
 
 export const register = (name: string, email: string, password: string) =>
-  api.post('/auth/register', { name, email, password }).then((r) => r.data.user)
+  api.post('/auth/register', { name, email, password }).then((r) => ({
+    user: r.data.user,
+    token: r.data.token || r.data.accessToken,
+  }))
 
-export const logout = () => api.post('/auth/logout')
+export const logout = () => {
+  useAuthStore.getState().logout()
+  return api.post('/auth/logout').catch(() => ({}))
+}
 
 export const getMe = () => api.get('/auth/me').then((r) => r.data)
 
 // ── Google Auth helpers ────────────────────────────────────
 export const googleAuth = (credential: string) =>
-  api.post('/auth/google', { credential }).then((r) => r.data.user)
+  api.post('/auth/google', { credential }).then((r) => ({
+    user: r.data.user,
+    token: r.data.token || r.data.accessToken,
+  }))
 
 // ── Order helpers ─────────────────────────────────────────
 export const createOrder = (payload: {

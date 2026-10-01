@@ -70,6 +70,8 @@ router.post('/google', async (req, res) => {
 
     return res.json({
       message: 'Google authentication successful',
+      token: accessToken,
+      accessToken,
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {

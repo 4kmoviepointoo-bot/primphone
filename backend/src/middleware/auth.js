@@ -7,13 +7,20 @@ const jwt = require('jsonwebtoken');
  */
 function authenticate(req, res, next) {
   try {
+    let token = null;
     const authHeader = req.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else if (req.cookies && (req.cookies.accessToken || req.cookies.token)) {
+      token = req.cookies.accessToken || req.cookies.token;
+    }
+
+    if (!token) {
       return res.status(401).json({ error: 'Access token required' });
     }
 
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+    const jwtSecret = process.env.JWT_SECRET || 'primphone_super_secret_jwt_key_2024_production_ready';
+    const decoded = jwt.verify(token, jwtSecret, { algorithms: ['HS256'] });
     req.user = decoded;
     next();
   } catch (err) {
@@ -31,10 +38,17 @@ function authenticate(req, res, next) {
  */
 function optionalAuth(req, res, next) {
   try {
+    let token = null;
     const authHeader = req.headers['authorization'];
     if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+      token = authHeader.split(' ')[1];
+    } else if (req.cookies && (req.cookies.accessToken || req.cookies.token)) {
+      token = req.cookies.accessToken || req.cookies.token;
+    }
+
+    if (token) {
+      const jwtSecret = process.env.JWT_SECRET || 'primphone_super_secret_jwt_key_2024_production_ready';
+      const decoded = jwt.verify(token, jwtSecret, { algorithms: ['HS256'] });
       req.user = decoded;
     }
   } catch (err) {

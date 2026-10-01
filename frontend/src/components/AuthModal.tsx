@@ -36,7 +36,7 @@ export default function AuthModal() {
       } else {
         result = await register(formData.name, formData.email, formData.password)
       }
-      setAuth(result?.user ?? result)
+      setAuth(result.user, result.token)
       closeAuthModal()
       setFormData({ name: '', email: '', password: '' })
     } catch (err: unknown) {
@@ -160,8 +160,8 @@ export default function AuthModal() {
                   setLoading(true)
                   setError('')
                   try {
-                    const user = await googleAuth(credentialResponse.credential!)
-                    setAuth(user)
+                    const res = await googleAuth(credentialResponse.credential!)
+                    setAuth(res.user, res.token)
                     closeAuthModal()
                     setFormData({ name: '', email: '', password: '' })
                   } catch (err: unknown) {

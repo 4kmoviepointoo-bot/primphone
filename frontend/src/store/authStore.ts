@@ -11,9 +11,10 @@ export interface User {
 
 interface AuthStore {
   user: User | null
+  token: string | null
   isAuthModalOpen: boolean
   authMode: 'login' | 'register'
-  setAuth: (user: User) => void
+  setAuth: (user: User, token?: string) => void
   logout: () => void
   openAuthModal: (mode?: 'login' | 'register') => void
   closeAuthModal: () => void
@@ -24,13 +25,14 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       user: null,
+      token: null,
       isAuthModalOpen: false,
       authMode: 'login',
 
-      setAuth: (user) => set({ user }),
+      setAuth: (user, token) => set((state) => ({ user, token: token ?? state.token })),
       logout: () => {
         useCartStore.getState().clearCart()
-        set({ user: null })
+        set({ user: null, token: null })
       },
       openAuthModal: (mode = 'login') => set({ isAuthModalOpen: true, authMode: mode }),
       closeAuthModal: () => set({ isAuthModalOpen: false }),
@@ -38,7 +40,7 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'primphone-auth',
-      partialize: (state) => ({ user: state.user }),
+      partialize: (state) => ({ user: state.user, token: state.token }),
     }
   )
 )
