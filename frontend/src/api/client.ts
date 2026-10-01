@@ -178,13 +178,25 @@ export const createOrder = (payload: {
   shipping_address: Record<string, string>
 }) => api.post('/orders', payload).then((r) => r.data)
 
-export const fetchMyOrders = () => api.get('/orders').then((r) => r.data)
+export const fetchMyOrders = () =>
+  api.get('/orders').then((r) => {
+    const data = r.data
+    if (Array.isArray(data)) return data
+    if (Array.isArray(data?.orders)) return data.orders
+    return []
+  })
 
 export const fetchOrder = (id: string) =>
   api.get(`/orders/${id}`).then((r) => r.data)
 
 // ── Admin helpers ─────────────────────────────────────────
-export const adminFetchAllOrders = () => api.get('/orders?all=true').then((r) => r.data)
+export const adminFetchAllOrders = () =>
+  api.get('/orders?all=true').then((r) => {
+    const data = r.data
+    if (Array.isArray(data)) return data
+    if (Array.isArray(data?.orders)) return data.orders
+    return []
+  })
 
 export const adminCreateProduct = (data: FormData) =>
   api.post('/products', data, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data)

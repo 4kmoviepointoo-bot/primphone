@@ -34,10 +34,18 @@ export default function MyOrders() {
       return
     }
     fetchMyOrders()
-      .then(setOrders)
-      .catch(console.error)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : (res?.orders || [])
+        setOrders(list)
+      })
+      .catch((err) => {
+        console.error(err)
+        setOrders([])
+      })
       .finally(() => setLoading(false))
   }, [user, openAuthModal, navigate])
+
+  const orderList = Array.isArray(orders) ? orders : []
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-20">
@@ -56,7 +64,7 @@ export default function MyOrders() {
           <div className="space-y-4">
             {[1, 2, 3].map((i) => <div key={i} className="h-24 rounded-xl skeleton" />)}
           </div>
-        ) : orders.length === 0 ? (
+        ) : orderList.length === 0 ? (
           <motion.div
             className="text-center py-24"
             initial={{ opacity: 0, y: 20 }}
@@ -74,7 +82,7 @@ export default function MyOrders() {
           </motion.div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order, i) => {
+            {orderList.map((order, i) => {
               const status = statusConfig[order.status] || statusConfig.processing
               let parsedItems: { quantity: number; price: number }[] = []
               try {

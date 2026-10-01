@@ -34,7 +34,16 @@ export default function AdminOrders() {
 
   useEffect(() => {
     if (!user || user.role !== 'admin') { navigate('/'); return }
-    adminFetchAllOrders().then(setOrders).finally(() => setLoading(false))
+    adminFetchAllOrders()
+      .then((res) => {
+        const list = Array.isArray(res) ? res : (res?.orders || [])
+        setOrders(list)
+      })
+      .catch((err) => {
+        console.error(err)
+        setOrders([])
+      })
+      .finally(() => setLoading(false))
   }, [user, navigate])
 
   const updateStatus = async (id: string, status: string) => {
